@@ -1,0 +1,17 @@
+void divisor_count()
+{
+    dp[1] = 1;
+    dp[2] = dp[3] = 2;
+    for(int i=4; i<N; i++)
+    {
+        ll y = i, n = 1;
+        ll z = p[y], c = 1;
+        while(y%z==0)
+        {
+            c++;
+            y/=z;
+        }
+        n *= c;
+        dp[i] = dp[y]*c;
+    }
+}
