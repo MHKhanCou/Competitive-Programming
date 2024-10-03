@@ -1,0 +1,10 @@
+ll binpow(ll x, ll n, ll mod)
+{
+    ll r = 1;
+    while(n){
+        if(n&1) r = (r*x)%mod;
+        x = (x*x) % mod;
+        n/=2;
+    }
+    return r;
+}
