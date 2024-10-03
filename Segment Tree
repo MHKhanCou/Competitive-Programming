@@ -1,0 +1,63 @@
+
+struct ST {
+    #define lc (nd << 1)
+    #define rc ((nd << 1) | 1)
+    vector<ll> tree, lazy;
+    ST (int n) {
+        tree.resize(4 * n, 0);
+        lazy.resize(4 * n, 0);
+    }
+
+    inline void uthao(int nd) {
+        tree[nd] = tree[lc] + tree[rc];
+    }
+
+    inline ll milao(ll x, ll y) {
+        return x + y;
+    }
+
+    void push(int nd, int b, int e) {
+        if (lazy[nd] == 0) return;
+        tree[nd] += (e - b + 1) * lazy[nd];
+        if (b != e) {
+            lazy[lc] += lazy[nd];
+            lazy[rc] += lazy[nd];
+        }
+        lazy[nd] = 0;
+    }
+
+    void build(int nd, int b, int e) {
+        if (b == e) {
+            tree[nd] = a[b];
+            return;
+        }
+        int mid = (b + e) >> 1;
+        build(lc, b, mid);
+        build(rc, mid + 1, e);
+        uthao(nd);
+    }
+
+    ll query(int nd, int b, int e, int l, int r) {
+        push(nd, b, e);
+        if (r < b || l > e) return 0;
+        if (l <= b && r >= e) {
+            return tree[nd];
+        }
+        int mid = (b + e) >> 1;
+        return milao(query(lc, b, mid, l, r), query(rc, mid + 1, e, l, r));
+    }
+
+    void update(int nd, int b, int e, int l, int r, ll val) {
+        push(nd, b, e);
+        if (r < b || l > e) return;
+        if (l <= b && r >= e) {
+            lazy[nd] = val;
+            push(nd, b, e);
+            return;
+        }
+        int mid = (b + e) >> 1;
+        update(lc, b, mid, l, r, val);
+        update(rc, mid + 1, e, l, r, val);
+        uthao(nd);
+    }
+};
