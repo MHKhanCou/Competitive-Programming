@@ -1,0 +1,54 @@
+// In the name of Allah, the Most Merciful, the Most Gracious
+#include <bits/stdc++.h>
+using namespace std;
+
+#define mh ios::sync_with_stdio(false); cin.tie(0);
+
+vector<int> make_lps(const string &p) {
+    int m = p.size();
+    vector<int> lps(m, 0);
+    for (int i = 1, j = 0; i < m; ) {
+        if (p[i] == p[j]) {
+            lps[i++] = ++j;
+        } else {
+            if (j != 0)
+                j = lps[j - 1];
+            else
+                lps[i++] = 0;
+        }
+    }
+    return lps;
+}
+
+vector<int> kmp(const string &s, const string &p) {
+    int n = s.size(), m = p.size();
+    vector<int> lps = make_lps(p);
+    vector<int> ans;
+    for (int i = 0, j = 0; i < n; ) {
+        if (s[i] == p[j]) ++j, ++i;
+        else {
+            if (j != 0) j = lps[j - 1];
+            else ++i;
+        }
+        if (j == m) {
+            ans.push_back(i - m); // 0-based index
+            j = lps[j - 1];
+        }
+    }
+    return ans;
+}
+
+void solve() {
+    string s, p;
+    cin >> s >> p;
+    vector<int> matches = kmp(s, p);
+    for (int idx : matches) {
+        cout << "Match found at index: " << idx << '\n';
+    }
+}
+
+int main() {
+    mh;
+    solve();
+    return 0;
+}
