@@ -1,0 +1,20 @@
+// XOR Hashing Template
+// Use Cases:
+// - Efficient range queries (e.g., sum, parity checks).
+// - Hashing sets or states (unique representation).
+// - Collison-resistant lightweight hashing in arrays or graphs.
+
+// Random number generator for hashing
+ll my_rand(ll l, ll r) {
+    static random_device rd;
+    static mt19937_64 rng(rd()); // 64-bit RNG
+    uniform_int_distribution<ll> dist(l, r);
+    return dist(rng); // Random number in range [l, r]
+}
+
+// Example Uses:
+// 1. Assign a random unique number to each distinct value.
+// 2. Transform input with cumulative XOR for efficient range queries:
+//    - Prefix XOR: v[i] = random[value[i]] ^ v[i-1].
+// 3. Handle duplicate states by hashing values with XOR.
+// 4. Hashing graphs: Combine node or edge labels with XOR.
