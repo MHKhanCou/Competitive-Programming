@@ -7,6 +7,8 @@ using namespace std;
   LIM := max{s[i]} + 2
 */
 
+// template taken from https://github.com/MathIsLife/PrewrittenCodes/blob/master/SuffixArray.cpp
+
 void inducedSort (const vector <int> &vec, int val_range, vector <int> &SA, const vector <int> &sl, const vector <int> &lms_idx) {
   vector <int> l(val_range, 0), r(val_range, 0);
   for (int c : vec) {
