@@ -1,56 +1,65 @@
-// Manacher Algorighm Class
-
 class Manacher {
-    string s;         // Original string
-    string t;         // Transformed string
-    vector<int> p;    // Palindrome radii
+    string s;                        // Original string
+    vector<vector<int>> p;           // Palindrome lengths (0 for odd, 1 for even)
+    int n;                           // Length of the original string
 
+    // Compute palindrome lengths for both odd and even palindromes
     void compute() {
-        int n = t.size();
-        p.assign(n, 0);
-        int c = 0, r = 0;
+        p.assign(2, vector<int>(n, 0)); // Initialize the radius vectors
+        for(int z = 0; z < 2; z++) {
+            for(int l = 0, r = 0, i = 0; i < n; i++) {
+                if(i < r) p[z][i] = min(r - i + !z, p[z][l + r - i + !z]);
 
-        for (int i = 0; i < n; i++) {
-            int mirr = 2 * c - i; // Mirror of i
-            if (i < r) p[i] = min(r - i, p[mirr]);
+                // Expand around the center
+                int L = i - p[z][i], R = i + p[z][i] - !z;
 
-            while (i - p[i] >= 0 && i + p[i] < n && t[i - p[i]] == t[i + p[i]])
-                p[i]++;
+                while (L - 1 >= 0 && R + 1 < n && s[L - 1] == s[R + 1]) {
+                    p[z][i]++;
+                    L--, R++;
+                }
 
-            p[i]--;
-            if (i + p[i] > r) {
-                c = i;
-                r = i + p[i];
+                if (R > r) {
+                    l = L, r = R;
+                }
             }
         }
     }
 
 public:
-    Manacher(const string &_s) : s(_s) {
-        t = "#";
-        for (char c : s) t += c, t += "#";
+    Manacher(const string &input) : s(input), n(input.size()) {
         compute();
     }
 
     bool isPalindrome(int l, int r) {
-        int c = l + r + 1; // Center in transformed string
         int len = r - l + 1;
-        return p[c] >= len;
+        int z = len % 2 == 0;             // Check if even or odd length
+        int center = (l + r + z) / 2;     // Calculate the center
+        return p[z][center] >= (len + z) / 2;
     }
 
+    // Count all palindromic substrings
     int countPalindromes() {
-        return accumulate(p.begin(), p.end(), 0) / 2;
+        int count = 0;
+        for (int z = 0; z < 2; z++) {
+            count += accumulate(p[z].begin(), p[z].end(), 0);
+        }
+        return count;
     }
 
+    // Get the longest palindromic substring
     pair<int, int> longestPalindrome() {
-        int max_len = 0, center = 0;
-        for (int i = 0; i < (int)p.size(); i++) {
-            if (p[i] > max_len) {
-                max_len = p[i];
-                center = i;
+        int maxLen = 0, center = 0, zType = 0;
+        for (int z = 0; z < 2; z++) {
+            for (int i = 0; i < n; i++) {
+                if (p[z][i] > maxLen) {
+                    maxLen = p[z][i];
+                    center = i;
+                    zType = z;
+                }
             }
         }
-        int start = (center - max_len) / 2;
-        return {start, max_len};
+        int start = center - maxLen;
+        int len = 2 * maxLen + zType;  // Length accounting for even or odd
+        return {start, len};
     }
 };
