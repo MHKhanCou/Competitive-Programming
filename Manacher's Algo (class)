@@ -1,6 +1,6 @@
 class Manacher {
     string s;                        // Original string
-    vector<vector<int>> p;           // Palindrome lengths (0 for odd, 1 for even)
+    vector<vector<int>> p;           // Palindrome lengths (0 for even, 1 for odd)
     int n;                           // Length of the original string
 
     // Compute palindrome lengths for both odd and even palindromes
