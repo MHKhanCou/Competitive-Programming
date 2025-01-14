@@ -1,0 +1,56 @@
+// Manacher Algorighm Class
+
+class Manacher {
+    string s;         // Original string
+    string t;         // Transformed string
+    vector<int> p;    // Palindrome radii
+
+    void compute() {
+        int n = t.size();
+        p.assign(n, 0);
+        int c = 0, r = 0;
+
+        for (int i = 0; i < n; i++) {
+            int mirr = 2 * c - i; // Mirror of i
+            if (i < r) p[i] = min(r - i, p[mirr]);
+
+            while (i - p[i] >= 0 && i + p[i] < n && t[i - p[i]] == t[i + p[i]])
+                p[i]++;
+
+            p[i]--;
+            if (i + p[i] > r) {
+                c = i;
+                r = i + p[i];
+            }
+        }
+    }
+
+public:
+    Manacher(const string &_s) : s(_s) {
+        t = "#";
+        for (char c : s) t += c, t += "#";
+        compute();
+    }
+
+    bool isPalindrome(int l, int r) {
+        int c = l + r + 1; // Center in transformed string
+        int len = r - l + 1;
+        return p[c] >= len;
+    }
+
+    int countPalindromes() {
+        return accumulate(p.begin(), p.end(), 0) / 2;
+    }
+
+    pair<int, int> longestPalindrome() {
+        int max_len = 0, center = 0;
+        for (int i = 0; i < (int)p.size(); i++) {
+            if (p[i] > max_len) {
+                max_len = p[i];
+                center = i;
+            }
+        }
+        int start = (center - max_len) / 2;
+        return {start, max_len};
+    }
+};
