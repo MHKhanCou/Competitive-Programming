@@ -24,7 +24,7 @@ ll BigMod(ll a, ll b, ll M)
     return res;
 }
 
-const int N = 1e6+9;
+const int N = 1e6 + 9;
 
 const int MOD1 = 127657753, MOD2 = 987654319;
 const int b1 = 101, b2 = 997;
@@ -68,38 +68,28 @@ struct Hashing
             hs.push_back(p);
         }
     }
-    pii get_hash_value(int lo, int hi)   // 1 - indexed
+    ll get_hash_value(int lo, int hi)   // 1 - indexed
     {
         assert(1 <= lo && lo <= hi && hi <= sz);
         pii ans;
         ans.first = (hs[hi].first - hs[lo - 1].first + MOD1) * 1LL * inpw[lo - 1].first % MOD1;
         ans.second = (hs[hi].second - hs[lo - 1].second + MOD2) * 1LL * inpw[lo - 1].second % MOD2;
-        return ans;
+        return  ((ll) ans.first << 32) | ans.second;
     }
-    pii get_hash_value()
+    ll get_hash_value()
     {
         return get_hash_value(1, sz);
-    }
-    ll hashValue(int l, int r)
-    {
-        pii h = get_hash_value(l,r);
-        return ((ll) h.first << 32) | h.second;
-    }
-    ll hashValue()
-    {
-        pii h = get_hash_value(1,sz);
-        return ((ll) h.first << 32) | h.second;
     }
 
     bool lexographic_less(int l1, int l2, int len)
     {
-        if(hashValue(l1, l1+len-1) == hashValue(l2, l2+len-1)) return false;
+        if (get_hash_value(l1, l1 + len - 1) ==  get_hash_value(l2, l2 + len - 1)) return false;
 
         ll lo = 1, hi = len, pos = 0;
-        while(lo <= hi)
+        while (lo <= hi)
         {
             int mid = (lo + hi) >> 1;
-            if(hashValue(l1, l1 + mid - 1) == hashValue(l2, l2 + mid - 1))
+            if (get_hash_value(l1, l1 + mid - 1) ==  get_hash_value(l2, l2 + mid - 1))
             {
                 lo = mid + 1;
                 pos = mid;
@@ -113,17 +103,13 @@ struct Hashing
     }
 };
 
-pii merge_hash(pii x, pii y, int z)//z-len of x
+ll merge_hash(ll hash1, ll hash2, int z) //z-len of hash1
 {
-    pii an;
-    an.F = (x.F + (1LL * pw[z].F * y.F) % MOD1) % MOD1;
-    an.S = (x.S + (1LL * pw[z].S * y.S) % MOD2) % MOD2;
-    return an;
-}
-
-void print_hash(pii hash_value)
-{
-    cout << "Hash (MOD1, MOD2): " << hash_value.F << ", " << hash_value.S << nl;
+    int h1_F = hash1 >> 32, h1_S = hash1 & 0xFFFFFFFF;
+    int h2_F = hash2 >> 32, h2_S = hash2 & 0xFFFFFFFF;
+    int ans_F = (h1_F + 1LL * h2_F * pw[z].first % MOD1) % MOD1;
+    int ans_S = (h1_S + 1LL * h2_S * pw[z].second % MOD2) % MOD2;
+    return (1LL * ans_F << 32) | ans_S;
 }
 
 
@@ -133,13 +119,13 @@ void solve()
     cin >> s;
     Hashing h(s);
     int q;
-    cin>>q;
-    while(q--)
+    cin >> q;
+    while (q--)
     {
         int l, r;
-        cin>>l>>r;
+        cin >> l >> r;
         l++;
-        ll ans = h.hashValue(l,r);
+        ll ans = h.get_hash_value(l, r);
         cout << ans << nl; // (ll)ans.F*ans.S
     }
 }
