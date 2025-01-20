@@ -39,7 +39,7 @@ void precalc()
 struct Seg_Hash {
 #define lc (nd << 1)
 #define rc ((nd << 1) | 1)
-	vector<pii> hs;  // Segment Tree to store hash values
+	vector<pii> hs;
 	string s;
 	int n;
 
@@ -85,7 +85,7 @@ struct Seg_Hash {
 		hs[nd] = merge_hash(hs[lc], hs[rc], mid - b + 1);
 	}
 	Seg_Hash(string _ss) {
-		s = "#" + _ss; / 1 - base
+		s = "#" + _ss; // 1 - base
 		n = s.size() - 1;
 		hs.resize(4 * n, {0, 0});
 		build(1, 1, n);
