@@ -1,93 +1,105 @@
 const int MOD1 = 127657753, MOD2 = 987654319;
 const int b1 = 101, b2 = 997;
 
-ll BigMod(ll a, ll b, ll M)
-{
-	ll res = 1;
-	a %= M;
-	while (b > 0)
-	{
-		if (b & 1) res = (res * a) % M;
-		b >>= 1;
-		a = (a * a) % M;
-	}
-	return res;
+ll BigMod(ll a, ll b, ll M) {
+    ll res = 1;
+    a %= M;
+    while (b > 0) {
+        if (b & 1) res = (res * a) % M;
+        b >>= 1;
+        a = (a * a) % M;
+    }
+    return res;
 }
 
-int inp1, inp2;
-pair<int, int> pw[N], inpw[N];
-//Template from YouKnowWho and RakibJoy
-void precalc()
-{
-	pw[0] =  {1, 1};
-	for (int i = 1; i < N; i++)
-	{
-		pw[i].first = 1LL * pw[i - 1].first * b1 % MOD1;
-		pw[i].second = 1LL * pw[i - 1].second * b2 % MOD2;
-	}
-	inp2 = BigMod(b2, MOD2 - 2, MOD2);
-	inp1 = BigMod(b1, MOD1 - 2, MOD1);
-	inpw[0] =  {1, 1};
-	for (int i = 1; i < N; i++)
-	{
-		inpw[i].first = 1LL * inpw[i - 1].first * inp1 % MOD1;
-		inpw[i].second = 1LL * inpw[i - 1].second * inp2 % MOD2;
-	}
+pii pw[N], inpw[N];
 
+void precalc() {
+    pw[0] = {1, 1};
+    for (int i = 1; i < N; i++) {
+        pw[i].first = 1LL * pw[i - 1].first * b1 % MOD1;
+        pw[i].second = 1LL * pw[i - 1].second * b2 % MOD2;
+    }
+    ll inp1 = BigMod(b1, MOD1 - 2, MOD1);
+    ll inp2 = BigMod(b2, MOD2 - 2, MOD2);
+    inpw[0] = {1, 1};
+    for (int i = 1; i < N; i++) {
+        inpw[i].first = 1LL * inpw[i - 1].first * inp1 % MOD1;
+        inpw[i].second = 1LL * inpw[i - 1].second * inp2 % MOD2;
+    }
 }
 
-struct Seg_Hash {
-#define lc (nd << 1)
-#define rc ((nd << 1) | 1)
-	vector<pii> hs;
-	string s;
-	int n;
+class SegTreeHash {
+    #define lc (nd << 1)
+    #define rc ((nd << 1) | 1)
 
-	inline pii merge_hash(pii x, pii y, int z) {
-		pii an;
-		an.F = (x.F + (1LL * pw[z].F * y.F % MOD1)) % MOD1;
-		an.S = (x.S + (1LL * pw[z].S * y.S % MOD2)) % MOD2;
-		return an;
-	}
+private:
+    vector<pii> hs;
+    string s;
+    int n;
 
-	void build(int nd, int b, int e) {
-		if (b == e) {
-			// Hash for a single character
-			hs[nd].F = (1LL * s[b] * pw[0].F % MOD1);
-			hs[nd].S = (1LL * s[b] * pw[0].S % MOD2);
-			return;
-		}
-		int mid = (b + e) >> 1;
-		build(lc, b, mid);
-		build(rc, mid + 1, e);
-		hs[nd] = merge_hash(hs[lc], hs[rc], mid - b + 1);
-	}
+    inline pii merge_hash(pii x, pii y) {
+        return {(x.first + y.first) % MOD1, (x.second + y.second) % MOD2};
+    }
 
-	pii get_hash_value(int nd, int b, int e, int l, int r) {
-		if (r < b || l > e) return {0, 0};
-		if (l <= b && r >= e) return hs[nd];
-		int mid = (b + e) >> 1;
-		pii left = get_hash_value(lc, b, mid, l, r);
-		pii right = get_hash_value(rc, mid + 1, e, l, r);
-		int len_left = max(0, min(mid, r) - max(b, l) + 1); // Overlap length
-		return merge_hash(left, right, len_left);
-	}
+    void build(int nd, int b, int e) {
+        if (b == e) {
+            hs[nd].first = (1LL * s[b] * pw[b].first) % MOD1;
+            hs[nd].second = (1LL * s[b] * pw[b].second) % MOD2;
+            return;
+        }
+        int mid = (b + e) >> 1;
+        build(lc, b, mid);
+        build(rc, mid + 1, e);
+        hs[nd] = merge_hash(hs[lc], hs[rc]);
+    }
 
-	void update(int nd, int b, int e, int pos, char val) {
-		if (b == e) {
-			hs[nd].F = (1LL * val * pw[0].F % MOD1);
-			hs[nd].S = (1LL * val * pw[0].S % MOD2);
-			return;
-		}
-		int mid = (b + e) >> 1;
-		if (pos <= mid) update(lc, b, mid, pos, val);
-		else update(rc, mid + 1, e, pos, val);
-		hs[nd] = merge_hash(hs[lc], hs[rc], mid - b + 1);
-	}
-	Seg_Hash(string _ss) {
-		s = "#" + _ss; // 1 - base
-		n = s.size() - 1;
-		hs.resize(4 * n, {0, 0});
-		build(1, 1, n);
-	}
+    pii query(int nd, int b, int e, int l, int r) {
+        if (r < b || l > e) return {0, 0};
+        if (l <= b && r >= e) return hs[nd];
+        int mid = (b + e) >> 1;
+        pii left = query(lc, b, mid, l, r);
+        pii right = query(rc, mid + 1, e, l, r);
+        return merge_hash(left, right);
+    }
+
+    void update(int nd, int b, int e, int pos, char val) {
+        if (b == e) {
+            hs[nd].first = (1LL * val * pw[b].first) % MOD1;
+            hs[nd].second = (1LL * val * pw[b].second) % MOD2;
+            return;
+        }
+        int mid = (b + e) >> 1;
+        if (pos <= mid) update(lc, b, mid, pos, val);
+        else update(rc, mid + 1, e, pos, val);
+        hs[nd] = merge_hash(hs[lc], hs[rc]);
+    }
+
+public:
+    SegTreeHash(string _s) {
+        s = "#" + _s; // 1-based indexing
+        n = s.size() - 1;
+        hs.resize(4 * n, {0, 0});
+        build(1, 1, n);
+    }
+
+    pii get_hash(int l, int r) { // 1-indexed
+        assert(1 <= l && l <= r && r <= n);
+        pii res = query(1, 1, n, l, r);
+        res.first = 1LL * res.first * inpw[l - 1].first % MOD1;
+        res.second = 1LL * res.second * inpw[l - 1].second % MOD2;
+        return res;
+    }
+
+    void modify(int pos, char val) { // 1-indexed
+        update(1, 1, n, pos, val);
+    }
 };
+
+pii merge_hash(pii x, pii y, int z)//z-len of x
+{
+    pii an;
+    an.F = (x.F + (1LL * pw[z].F * y.F) % MOD1) % MOD1;
+    an.S = (x.S + (1LL * pw[z].S * y.S) % MOD2) % MOD2;
+    return an;
+}
