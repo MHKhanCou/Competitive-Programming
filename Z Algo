@@ -1,3 +1,31 @@
+/*
+    Z ALGORITHM TEMPLATE - EXPLANATION
+
+    Overview:
+    ----------
+    The Z–algorithm computes an array Z for a given string s, where:
+      - Z[i] is the length of the longest substring starting at s[i] that is also a prefix of s.
+      - In other words, Z[i] = |Longest substring starting at s[i] that matches the prefix of s|.
+
+    How It Works:
+    --------------
+    - We iterate through the string s and maintain a window [l, r] which is the segment
+      that matches the prefix of s with the farthest right endpoint r.
+    - For each index i:
+        * If i is inside the current [l, r] window, we can use the previously computed values to initialize Z[i].
+        * Then we extend Z[i] by comparing characters until they mismatch.
+        * Update the window [l, r] if the new segment extends further right.
+    - The algorithm runs in O(n) time, where n is the length of s.
+
+    Usage:
+    -------
+    To find all occurrences of a pattern in a text:
+      1. Form the string: combined = pattern + "$" + text.
+      2. Compute the Z–array for combined.
+      3. For any index i (i > pattern.size()) such that Z[i] equals the pattern length,
+         there is an occurrence of the pattern starting at index (i - pattern.size() - 1) in the text.
+*/
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,13 +35,13 @@ vector<int> computeZ(const string &s) {
     int l = 0, r = 0;
 
     for (int i = 1; i < n; i++) {
-        if (i <= r) 
+        if (i <= r)
             z[i] = min(r - i + 1, z[i - l]);
         
-        while (i + z[i] < n && s[z[i]] == s[i + z[i]]) 
+        while (i + z[i] < n && s[z[i]] == s[i + z[i]])
             z[i]++;
         
-        if (i + z[i] - 1 > r) 
+        if (i + z[i] - 1 > r)
             l = i, r = i + z[i] - 1;
     }
     return z;
