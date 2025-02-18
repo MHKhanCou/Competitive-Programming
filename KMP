@@ -1,4 +1,30 @@
-// In the name of Allah, the Most Merciful, the Most Gracious
+/*
+    KMP (Knuth-Morris-Pratt) ALGORITHM - EXPLANATION
+
+    Overview:
+    ----------
+    The KMP algorithm efficiently finds occurrences of a pattern in a given text in O(n + m) time, 
+    where n is the text length and m is the pattern length. It avoids redundant character comparisons 
+    by utilizing a precomputed LPS (Longest Prefix Suffix) array.
+
+    How It Works:
+    --------------
+    1. **Preprocessing Phase (make_lps function)**:
+       - Compute the LPS array for the pattern.
+       - LPS[i] tells us the longest proper prefix of pattern[0..i] that is also a suffix.
+       - This helps in determining how much we can shift the pattern upon a mismatch.
+
+    2. **Matching Phase (kmp function)**:
+       - Use the LPS array to avoid unnecessary comparisons.
+       - If a mismatch occurs, shift the pattern efficiently instead of restarting from scratch.
+       - Store all positions where the pattern occurs in the text.
+
+    Usage:
+    -------
+    - Given a text "s" and a pattern "p", it finds all occurrences of "p" in "s".
+    - Returns a list of 0-based indices where the pattern starts in the text.
+*/
+
 #include <bits/stdc++.h>
 using namespace std;
 
