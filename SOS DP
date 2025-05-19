@@ -1,0 +1,76 @@
+// In the name of Allah, the Most Merciful, the Most Gracious
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define pb push_back
+#define vl vector<ll>
+#define mh ios::sync_with_stdio(false); cin.tie(0);
+#define tst int t;cin>>t;while(t--)
+#define nl '\n'
+
+
+// Max number of bits to consider in bitmask (for values up to 2^20)
+const int B = 20;
+
+// Arrays for input, and DP results
+int a[1 << B];   // input array (stores numbers from 1 to n)
+int f[1 << B];   // f[mask] = number of values that are subsets of `mask`
+int g[1 << B];   // g[mask] = number of values that are supersets of `mask`
+
+void solve()
+{
+	int n;
+	cin >> n;
+
+	// Read input and initialize frequency of each value
+	for (int i = 1; i <= n; ++i)
+	{
+		cin >> a[i];
+		f[a[i]]++;  // frequency for subset-sum DP
+		g[a[i]]++;  // frequency for superset-sum DP
+	}
+
+	// ================================
+	// Sum Over Subsets (SOS DP)
+	// f[mask] = number of y such that y ⊆ mask
+	// ================================
+	for (int i = 0; i < B; ++i) {
+		for (int mask = 0; mask < (1 << B); ++mask) {
+			if ((mask & (1 << i)) != 0) {
+				// add count from smaller subset (mask with i-th bit removed)
+				f[mask] += f[mask ^ (1 << i)];
+			}
+		}
+	}
+
+	// ================================
+	// Sum Over Supersets
+	// g[mask] = number of y such that y ⊇ mask
+	// ================================
+	for (int i = 0; i < B; ++i) {
+		for (int mask = 0; mask < (1 << B); ++mask) {
+			if ((mask & (1 << i)) != 0) {
+				// add count to smaller mask (remove i-th bit)
+				g[mask ^ (1 << i)] += g[mask];
+			}
+		}
+	}
+
+	// ================================
+	// Output results
+	// ================================
+	for (int i = 1; i <= n; i++) {
+		// f[a[i]]: Number of elements y such that y ⊆ a[i]
+		// g[a[i]]: Number of elements y such that y ⊇ a[i]
+		// n - f[~a[i]]: Number of y such that (y & a[i]) ≠ 0
+		cout << f[a[i]] << ' ' << g[a[i]] << ' ' << n - f[((1 << B) - 1) ^ a[i]] << '\n';
+	}
+}
+
+int main()
+{
+	mh
+	solve();
+	return 0;
+}
