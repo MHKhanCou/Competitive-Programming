@@ -1,0 +1,60 @@
+//Sliding GCD Segments (with Compression)
+
+void solve()
+{
+    ll n;
+    cin >> n;
+    vl a(n);
+    cinv(a);
+
+    // Step 1: Convert to absolute differences
+    // We're going to work with d[i] = |a[i] - a[i-1]|
+    for (int i = n - 1; i > 0; --i)
+    {
+        a[i] = llabs(a[i] - a[i - 1]);
+    }
+    a[0] = 0; // first element unused in difference array
+
+    ll ans = 1; // minimum subarray length is 1
+    vector<pii> g_list; // stores (gcd value, starting index)
+
+    for (int i = 1; i < n; ++i)
+    {
+        vector<pii> nw_list; // new GCD segments ending at index i
+
+        // Start a new segment with a[i] alone
+        nw_list.pb({a[i], i});
+
+        // If this single element already > 1, answer is at least 2
+        if (a[i] > 1)
+            ans = max(ans, 2ll);
+
+        // Extend all previous GCD segments to include a[i]
+        for (int j = g_list.size() - 1; j >= 0; --j)
+        {
+            ll prev_gcd = g_list[j].F;
+            ll id = g_list[j].S;
+
+            // New GCD when extending the segment with a[i]
+            ll nw = gcd(a[i], prev_gcd);
+
+            // Only keep distinct GCDs in order (to compress list)
+            if (!nw_list.empty() && nw == nw_list.back().F)
+                nw_list.pop_back();
+
+            nw_list.pb({nw, id});
+
+            // Update answer if GCD > 1
+            if (nw > 1)
+                ans = max(ans, i - id + 2);
+        }
+
+        // Reverse to keep order from earlier to later segments
+        reverse(nw_list.begin(), nw_list.end());
+        g_list = nw_list;
+    }
+
+    cout << ans << nl;
+}
+
+// https://codeforces.com/contest/1549/problem/D
