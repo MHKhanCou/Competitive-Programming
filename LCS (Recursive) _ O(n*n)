@@ -1,0 +1,58 @@
+// In the name of Alah, the most merciful, the most gracious
+#include <bits/stdc++.h>
+using namespace std;
+#define ll int
+#define pb push_back
+#define vl vector<ll>
+#define mh ios::sync_with_stdio(false); cin.tie(0);
+#define nl '\n'
+#define coutv(v) for(auto it:v)cout<<it<<' ';cout<<nl;
+#define rep(i, n) for (int i = 0; i < (n); ++i)
+#define F first
+#define S second
+
+const ll N = 3e3 + 5;
+
+ll dp[N][N];
+
+string s, t, ans;
+
+ll solve(int i, int j)
+{
+	if (i <= 0 or j <= 0) return 0;
+	ll &an = dp[i][j];
+	if (~an) return an;
+	an = 0;
+	if (s[i] == t[j]) an = max(an, 1 + solve(i - 1, j - 1));
+	an = max(an, solve(i - 1, j));
+	an = max(an, solve(i, j - 1));
+	return an;
+}
+
+void print(int i, int j)
+{
+	if (i <= 0 or j <= 0) return;
+	ll &an = dp[i][j];
+	if (s[i] == t[j] and an == 1 + solve(i - 1, j - 1)) {
+		print(i - 1, j - 1);
+		cout << s[i];
+	} else if (an == solve(i - 1, j)) print(i - 1, j);
+	else print(i, j - 1);
+}
+
+int main()
+{
+	mh
+	cin >> s >> t;
+	int n = s.size(), m = t.size();
+	s = "$" + s;
+	t = "$" + t;
+
+	memset(dp, -1, sizeof(dp));
+
+	int len = solve(n, m);
+
+	print(n, m);
+
+	return 0;
+}
