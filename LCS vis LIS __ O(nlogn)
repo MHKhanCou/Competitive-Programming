@@ -1,0 +1,71 @@
+// In the name of Allah, the Most Merciful, the Most Gracious
+
+#include <bits/stdc++.h>
+using namespace std;
+
+using ll = long long;
+
+//------------------------------------------------------------------------------
+// Computes LCS(A,B) in O(n log n) when A and B are permutations of [1..n].
+//------------------------------------------------------------------------------
+
+int lcs_via_lis(const vector<int>& A, const vector<int>& B) {
+	int n = A.size();
+	// 1) Build a map from value → its index in A
+	//    pos[v] = i  means A[i] == v
+	vector<int> pos(n + 1);
+	for (int i = 0; i < n; i++) {
+		pos[A[i]] = i;
+	}
+
+	// 2) Transform B into an index sequence over A
+	//    seq[i] = pos[B[i]]
+	vector<int> seq;
+	seq.reserve(n);
+	for (int v : B) {
+		seq.push_back(pos[v]);
+	}
+
+	// 3) Compute LIS length on seq[] in O(n log n)
+	//    lis[] will maintain the smallest possible tail for each length
+	vector<int> lis;
+	lis.reserve(n);
+
+	for (int x : seq) {
+		// Find insertion point of x in lis[] via binary search
+		auto it = lower_bound(lis.begin(), lis.end(), x);
+		if (it == lis.end()) {
+			// x extends largest subsequence by 1
+			lis.push_back(x);
+		} else {
+			// x can improve an existing subsequence of the same length
+			*it = x;
+		}
+	}
+	return (int)lis.size();
+}
+
+//------------------------------------------------------------------------------
+// Template I/O and solve()
+//------------------------------------------------------------------------------
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+
+	int n;
+	cin >> n;
+	vector<int> A(n), B(n);
+
+	// Read both permutations
+	for (int i = 0; i < n; i++) {
+		cin >> A[i];
+	}
+	for (int i = 0; i < n; i++) {
+		cin >> B[i];
+	}
+
+	// Output LCS length
+	cout << lcs_via_lis(A, B) << "\n";
+	return 0;
+}
