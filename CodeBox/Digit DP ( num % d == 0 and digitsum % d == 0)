@@ -1,0 +1,58 @@
+// In the name of Alah, the most merciful, the most gracious
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long
+#define mh ios::sync_with_stdio(false); cin.tie(0);
+#define nl '\n'
+
+int dp[10][100][100][2];
+
+int k, d;
+
+int DigitDP(int pos, int rem1, int rem2, int isSmall, const string &num) {
+	if (pos == k) return (rem1 == 0 && rem2 == 0);
+	int &an = dp[pos][rem1][rem2][isSmall];
+	if (~an) return an;
+	an = 0;
+
+	int hi = num[pos] - '0';
+	if (isSmall) hi = 9;
+
+	for (int dig = 0; dig <= hi; ++dig) {
+		int newSmall = isSmall | (dig < hi);
+		int newRem1 = (rem1 * 10 + dig) % d;
+		int newRem2 = (rem2 + dig) % d;
+		an += DigitDP(pos + 1, newRem1, newRem2, newSmall, num);
+	}
+
+	return an;
+}
+
+int count(ll x) {
+	string num = to_string(x);
+	k = num.size();
+	memset(dp, -1, sizeof(dp));
+	return DigitDP(0, 0, 0, 0, num);
+}
+
+int main()
+{
+	mh
+	int t;
+	cin >> t;
+	for (int cs = 1; cs <= t; ++cs) {
+		ll a, b;
+		cin >> a >> b >> d;
+
+		if (d >= 100) {
+			cout << "Case " << cs << ": " << 0 << nl;
+		} else {
+			int ans = count(b) - count(a - 1);
+			cout << "Case " << cs << ": " << ans << nl;
+		}
+	}
+
+	return 0;
+}
+
+//https://lightoj.com/problem/investigation
