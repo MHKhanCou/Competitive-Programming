@@ -1,0 +1,81 @@
+// https://lightoj.com/problem/palindromic-numbers
+
+// In the name of Allah, the most merciful, the most gracious
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+#define nl "\n"
+
+string S;
+
+// dp[i][j][isSmall][isBig][start] stores result for digit positions i, j
+// isSmall = 1 if prefix so far is already less than corresponding prefix of S
+// isBig   = 1 if suffix so far is already greater than corresponding suffix of S
+// start   = 1 if we are still skipping leading zeros
+ll dp[20][20][2][2][2];
+
+// Recursive DP to count valid palindromic numbers within bound
+ll go(int i, int j, int isSmall, int isBig, int start) {
+	if (i > j) {
+		// Base case: full number built
+		// Valid if left side is smaller than bound, or right side hasn't exceeded
+		return (isSmall or !isBig);
+	}
+
+	ll &res = dp[i][j][isSmall][isBig][start];
+	if (res != -1) return res;
+	res = 0;
+
+	int low = 0;
+	int high = isSmall ? 9 : (S[i] - '0');  // left digit upper bound
+
+	// Option to skip this position (still leading zeros)
+	if (start) {
+		res += go(i + 1, j, 1, 0, 1);
+	}
+
+	// Try placing digit d at position i and mirror it at position j
+	for (int d = low; d <= high; ++d) {
+		if (start && d == 0) continue;  // skip leading zeros
+		int ndL = isSmall | (d < (S[i] - '0'));  // left side becomes small
+		int ndR = isBig   | (d > (S[j] - '0'));  // right side becomes big
+
+		if (isBig) {
+			// Already exceeded right suffix; try placing smaller or equal digits
+			if (d < S[j] - '0') res += go(i + 1, j - 1, ndL, 0, 0);
+			else               res += go(i + 1, j - 1, ndL, 1, 0);
+		} else {
+			// Still tight on right side, propagate new status
+			res += go(i + 1, j - 1, ndL, ndR, 0);
+		}
+	}
+	return res;
+}
+
+// Counts how many palindromic numbers ≤ x
+ll countPalDP(ll x) {
+	if (x < 0) return 0;
+	if (x == 0) return 1;
+
+	S = to_string(x);
+	memset(dp, -1, sizeof(dp));
+	return go(0, S.size() - 1, 0, 0, 1);
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+
+	int T;
+	cin >> T;
+	for (int tc = 1; tc <= T; ++tc) {
+		ll L, R;
+		cin >> L >> R;
+		if (L > R) swap(L, R);
+
+		// Answer = palindromes in [L, R] = count(R) - count(L - 1)
+		ll ansDP = countPalDP(R) - countPalDP(L - 1);
+		cout << "Case " << tc << ": " << ansDP << nl;
+	}
+	return 0;
+}
