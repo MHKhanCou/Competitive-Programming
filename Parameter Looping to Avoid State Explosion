@@ -1,0 +1,70 @@
+// https://atcoder.jp/contests/abc336/tasks/abc336_e
+
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long
+#define mh ios::sync_with_stdio(false); cin.tie(0);
+#define nl '\n'
+#define vl vector<ll>
+#define vi vector<int>
+#define all(v) (v).begin(), (v).end()
+
+int cnt[10];
+
+// dp[pos][sum][rem][tight][started]
+// pos: current digit position
+// sum: current digit sum so far
+// rem: current number mod S
+// tight: whether we are still bounded by the input num
+// started: whether we have started placing non-zero digits yet
+ll dp[15][130][130][2][2], n;
+string num;
+
+int S; // Current target digit sum (we loop over all possible values for it)
+
+ll digitDP(int pos, int sum, int rem, bool tight, bool started) {
+	if (pos == n) {
+		// Base case: valid number must be started, divisible by S, and have digit sum S
+		return (started && rem == 0 and S == sum) ? 1 : 0;
+	}
+
+	ll &ans = dp[pos][sum][rem][tight][started];
+	if (~ans) return ans;
+	ans = 0;
+
+	int limit = tight ? (num[pos] - '0') : 9;
+
+	for (int digit = 0; digit <= limit; digit++) {
+		bool newTight = tight && (digit == limit);
+		bool newStarted = started || (digit > 0);
+		int newSum = sum + digit;
+
+		// Only compute remainder mod S if we’ve already started the number
+		int newRem = started ? (rem * 10 + digit) % S : 0;
+
+		ans += digitDP(pos + 1, newSum, newRem, newTight, newStarted);
+	}
+
+	return ans;
+}
+
+int main() {
+	mh
+	cin >> num;
+	n = num.size();
+
+	ll ans = 0;
+
+	// Optimization Trick:
+	// We avoid putting 'sum' and 'S' as separate state variables.
+	// Instead, we loop over each possible S from 1 to 126 (max digit sum for 14 digits)
+	// and in each run, we **fix S**, and run digitDP for all numbers with that S.
+	for (S = 1; S <= 126; ++S) {
+		memset(dp, -1, sizeof(dp));
+		ans += digitDP(0, 0, 0, 1, 0);
+	}
+
+	cout << ans << nl;
+
+	return 0;
+}
