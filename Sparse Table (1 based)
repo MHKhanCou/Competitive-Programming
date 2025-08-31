@@ -1,0 +1,79 @@
+// In the name of Allah, the most merciful, the most gracious
+#include <bits/stdc++.h>
+using namespace std;
+
+// ------------------------- Macros -------------------------
+#define ll long long
+#define pb push_back
+#define vl vector<ll>
+#define vi vector<int>
+#define mh ios::sync_with_stdio(false); cin.tie(0);
+#define tst int t; cin >> t; while (t--)
+#define nl '\n'
+#define cinv(v) for (auto &it : v) cin >> it;
+#define coutv(v) for (auto it : v) cout << it << ' '; cout << nl;
+#define rep(i,n) for (int i = 0; i < (n); ++i)
+#define loop(i,a,b) for (int i = (a); i <= (b); ++i)
+#define rev(i,n) for (int i = (n)-1; i >= 0; --i)
+#define all(v) (v).begin(), (v).end()
+#define rall(v) (v).rbegin(), (v).rend()
+#define pii pair<int,int>
+#define F first
+#define S second
+#define yes cout << "Yes\n"
+#define no cout << "No\n"
+
+const ll INF = LLONG_MAX;
+const ll MOD = 1000000007;
+const double PI = 2 * acos(0.0);
+
+// ------------------------- Utilities -------------------------
+inline ll gcd(ll a, ll b) { return __gcd(a, b); }
+inline ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
+
+// ------------------------- Sparse Table -------------------------
+// 1-based Sparse Table for GCD queries >> MIN/MAX/LCM
+struct SparseTable {
+    int n, LOG;
+    vector<vector<ll>> st;
+
+    SparseTable() {}
+    SparseTable(const vector<ll> &arr) {
+        n = (int)arr.size() - 1; // arr must be 1-based
+        LOG = 32 - __builtin_clz(n);
+        st.assign(n + 1, vector<ll>(LOG));
+        for (int i = 1; i <= n; i++) st[i][0] = arr[i];
+        for (int j = 1; j < LOG; j++) {
+            for (int i = 1; i + (1 << j) - 1 <= n; i++) {
+                st[i][j] = gcd(st[i][j-1], st[i + (1 << (j-1))][j-1]);
+            }
+        }
+    }
+
+    ll query(int l, int r) { // inclusive, 1-based
+        int j = 31 - __builtin_clz(r - l + 1);
+        return gcd(st[l][j], st[r - (1 << j) + 1][j]);
+    }
+};
+
+// ------------------------- Solve -------------------------
+void solve() {
+    int n;
+    cin >> n;
+    vector<ll> a(n+1), b(n+1);
+    for (int i = 1; i <= n; i++) cin >> a[i];
+    for (int i = 1; i <= n; i++) cin >> b[i];
+
+    SparseTable sa(a), sb(b);
+
+    // Example queries:
+    cout << "GCD of a[1..3] = " << sa.query(1, 3) << nl;
+    cout << "GCD of b[2..4] = " << sb.query(2, 4) << nl;
+}
+
+// ------------------------- Main -------------------------
+int main() {
+    mh
+    tst solve();
+    return 0;
+}
