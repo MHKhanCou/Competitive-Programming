@@ -1,0 +1,64 @@
+// Two pointer template for "count subarrays with property"
+struct TwoPointer {
+    vector<ll> &a;
+    ll n;
+    ll i;
+    ll ans;
+
+    // state variables for the current window
+    multiset<ll> ms;       // example: use multiset for max-min
+    ll sum;                // example: use sum for subarray sums
+    ll distinct;           // example: use for distinct counts
+    unordered_map<ll,int> freq;
+
+    TwoPointer(vector<ll> &arr) : a(arr) {
+        n = a.size();
+        i = 0;
+        ans = 0;
+        sum = 0;
+        distinct = 0;
+    }
+
+    // define what happens when you add/remove elements
+    void add(ll idx) {
+        // example (sum case):
+        sum += a[idx];
+
+        // example (distinct case):
+        // if (++freq[a[idx]] == 1) distinct++;
+
+        // example (max-min case):
+        // ms.insert(a[idx]);
+    }
+
+    void remove(ll idx) {
+        // example (sum case):
+        sum -= a[idx];
+
+        // example (distinct case):
+        // if (--freq[a[idx]] == 0) distinct--;
+
+        // example (max-min case):
+        // ms.erase(ms.find(a[idx]));
+    }
+
+    bool valid(ll k) {
+        // modify per problem
+        // return (sum <= k);
+        // return (distinct <= k);
+        // return (*ms.rbegin() - *ms.begin() <= k);
+        return true;
+    }
+
+    ll solve(ll k) {
+        for (ll j = 0; j < n; j++) {
+            add(j);
+            while (i <= j && !valid(k)) {
+                remove(i);
+                i++;
+            }
+            ans += (j - i + 1);
+        }
+        return ans;
+    }
+};
