@@ -1,4 +1,4 @@
-// In the name of Alah, the most merciful, the most gracious
+// In the name of Allah, the most merciful, the most gracious
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -6,7 +6,7 @@ using namespace std;
  #include <ext/pb_ds/tree_policy.hpp>
  using namespace __gnu_pbds;
  template <class T> using ordered_set = tree<T, null_type,
-          less<T>, rb_tree_tag, tree_order_statistics_node_update>;⠀
+          less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 #define ll long long
 #define pb push_back
@@ -15,9 +15,6 @@ using namespace std;
 #define nl '\n'
 #define cinv(v) for(auto &it:v)cin>>it;
 #define coutv(v) for(auto it:v)cout<<it<<' ';cout<<nl;
-#define rep(i, n) for (int i = 0; i < (n); ++i)
-#define loop(i,a,b) for (int i=a; i <= b; ++i)
-#define rev(i, n) for (int i = (n)-1; i >= 0; --i)
 #define srt(v) sort(v.begin(),v.end());
 #define rsrt(v) sort(v.rbegin(),v.rend());
 #define all(v) (v).begin(), (v).end()
