@@ -11,27 +11,32 @@ struct FlowEdge {
 };
 
 struct Dinic {
-    const long long INF = (long long)4e18;
-    int n, s, t;
-    vector<FlowEdge> edges;
-    vector<vector<int>> g;
-    vector<int> level, ptr;
+    const ll INF = (ll)4e18;
+    int n;                     // number of nodes
+    vector<vector<int>> g;     // adjacency: stores edge indices
+    vector<FlowEdge> edges;    // edge list (forward, reverse pairs)
+    vector<int> level;         // level graph
+    vector<int> ptr;           // current edge pointer
+    int s, t;
 
-    Dinic(int _n=0) { init(_n); }
+    Dinic(int _n = 0) { init(_n); }
 
     void init(int _n) {
         n = _n;
-        g.assign(n+1, {});
+        g.assign(n + 1, {});
         edges.clear();
-        level.resize(n+1);
-        ptr.resize(n+1);
+        level.assign(n + 1, -1);
+        ptr.assign(n + 1, 0);
     }
 
-    void add_edge(int u, int v, long long cap) {
-        edges.emplace_back(u, v, cap);
-        edges.emplace_back(v, u, 0);
-        g[u].push_back((int)edges.size()-2);
-        g[v].push_back((int)edges.size()-1);
+    // add directed edge u -> v with capacity cap
+    // returns index of the forward edge in edges[]
+    int add_edge(int u, int v, ll cap) {
+        edges.emplace_back(u, v, cap);    // forward edge (index = edges.size()-1)
+        edges.emplace_back(v, u, 0);      // reverse edge (index = edges.size()-1)
+        g[u].push_back((int)edges.size() - 2);
+        g[v].push_back((int)edges.size() - 1);
+        return (int)edges.size() - 2;     // index of forward edge
     }
 
     bool bfs() {
@@ -52,35 +57,35 @@ struct Dinic {
         return level[t] != -1;
     }
 
-    long long dfs(int v, long long pushed) {
-        if (!pushed) return 0;
+    ll dfs(int v, ll pushed) {
+        if (pushed == 0) return 0;
         if (v == t) return pushed;
-        for (int &cid = ptr[v]; cid < (int)g[v].size(); cid++) {
+        for (int &cid = ptr[v]; cid < (int)g[v].size(); ++cid) {
             int id = g[v][cid];
             FlowEdge &e = edges[id];
-            if (level[e.u] != level[v] + 1 || e.cap - e.flow <= 0) continue;
-            long long tr = dfs(e.u, min(pushed, e.cap - e.flow));
-            if (!tr) continue;
-            e.flow += tr;
-            edges[id ^ 1].flow -= tr;
+            if (level[e.u] != level[v] + 1) continue;
+            ll tr = dfs(e.u, min(pushed, e.cap - e.flow));
+            if (tr == 0) continue;
+            edges[id].flow += tr;
+            edges[id ^ 1].flow -= tr; // id^1 is the reverse edge
             return tr;
         }
         return 0;
     }
 
-    long long max_flow(int _s, int _t, long long limit=-1) {
+    ll max_flow(int _s, int _t) {
         s = _s; t = _t;
-        long long flow = 0;
+        ll flow = 0;
         while (bfs()) {
             fill(ptr.begin(), ptr.end(), 0);
-            while (long long pushed = dfs(s, INF)) {
+            while (ll pushed = dfs(s, INF)) {
                 flow += pushed;
-                if (limit != -1 && flow >= limit) return limit; // optional early exit
             }
         }
         return flow;
     }
 };
+
 
 int main() {
     mh
