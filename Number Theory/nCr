@@ -1,0 +1,67 @@
+// In the name of Allah
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define pb push_back
+#define vl vector<ll>
+#define mh ios::sync_with_stdio(false); cin.tie(0);
+#define tst int t;cin>>t;while(t--)
+#define nl '\n'
+#define rep(i,n) for(int i=0;i<n;i++)
+#define loop(i,a,b) for(int i=a;i<=b;i++)
+#define rev(i,n) for(int i=n-1;i>=0;i--)
+#define all(v) (v).begin(),(v).end()
+#define rall(v) (v).rbegin(),(v).rend()
+#define pii pair<int,int>
+#define F first
+#define S second
+
+const ll N = 5000, MOD = 1e9+7;
+ll fact[N+5];
+int com[N+5][N+5];
+
+void pre() {
+    fact[0]=1;
+    loop(i,1,N) fact[i]=(fact[i-1]*i)%MOD;
+}
+
+int BigMod(ll p,ll q,int mod) {
+    ll ans=1; p%=mod;
+    if(p<0)p+=mod;
+    while(q) {
+        if(q&1) ans=(ans*p)%mod;
+        p=(p*p)%mod; q>>=1;
+    }
+    return ans%mod;
+}
+
+void combination() {
+    com[0][0]=1;
+    loop(i,1,N) {
+        com[i][0]=1;
+        loop(j,1,i) com[i][j]=(com[i-1][j]+com[i-1][j-1])%MOD;
+    }
+}
+
+ll ncr(ll n,ll r) {
+    if(n<r) return 0;
+    if(n<=N) return com[n][r];
+    ll an=fact[n], d=(fact[r]*fact[n-r])%MOD;
+    an=(an*BigMod(d,MOD-2,MOD))%MOD;
+    return an;
+}
+
+void solve() {
+    ll n,r; cin>>n>>r;
+    cout<<ncr(n,r)<<nl;
+}
+
+int main() {
+    mh
+    pre();
+    combination();
+    // tst solve();
+    solve();
+    return 0;
+}
