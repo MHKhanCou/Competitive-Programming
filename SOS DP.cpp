@@ -123,7 +123,7 @@ int main() {
     mh;
     // Example driver: read N, K, N strings, then M queries (same format you used earlier)
     int n;
-    if (!(cin >> n >> k)) return 0;
+    cin >> n >> k;
     cin >> ws;
     LIM = 1 << k;
 
